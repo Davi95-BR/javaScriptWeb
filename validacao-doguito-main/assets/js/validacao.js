@@ -81,7 +81,7 @@ function maiorQue18(data) {
 function  validaCPF(input) {
     const cpfFormatado = input.value.replace(/\D/g, '')      // Pegando tudo que não for dígito e colocando '' para formatar o cpf
     let mensagem = ''
-    if(!chechaCPFRepetido(cpfFormatado)) {
+    if(!chechaCPFRepetido(cpfFormatado) || !checaEstruturaCPF(cpfFormatado)) {
         mensagem = 'O CPF digitado não é válido'
     }
 
@@ -109,5 +109,42 @@ function chechaCPFRepetido(cpf) {
         }
     })
 
-    return cpfvalido
+    return cpfValido
 }
+
+function checaEstruturaCPF(cpf) {
+    const multiplicador = 10
+
+    return checaDigitoVerificador(cpf, multiplicador)
+
+}
+
+function checaDigitoVerificador(cpf, multiplicador) {  
+    if(multiplicador >= 12) {
+        return true
+    }
+
+    let multiplicadorInicial = multiplicador
+    let soma = 0 
+    const cpfSemDigitos = cpf.substr(0, multiplicador - 1).split('')
+    const digitoVerificador = cpf.charAt(multiplicador - 1)
+    for(let contador = 0; multiplicadorInicial > 1; multiplicadorInicial--) {
+        soma = soma + cpfSemDigitos[contador] * multiplicadorInicial
+        contador++
+    }
+    if(digitoVerificador == confirmaDigito(soma)) {
+        return checaDigitoVerificador(cpf, multiplicador + 1)
+    }
+    
+    return false
+}
+
+
+function confirmaDigito(soma) {
+    return 11 - (soma % 11)
+}
+/*
+let soma = (10 * 1) + (9 * 2) + (8 *3) + (7 *4) + (6 * 5) + (5 * 6) +
+
+let digitoVerificador = 11 - (soma % 11)
+*/
