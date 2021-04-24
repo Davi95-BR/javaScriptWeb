@@ -42,14 +42,24 @@ const mensagensDeErro = {
     },
     cep: {
         valueMissing: 'O campo de CEP não pode estar vazio.',
-        patternMismatch: 'O CEP digitado não é válido.'
+        patternMismatch: 'O campo deve ter 8 dígitos'
+    },
+    logradouro: {
+        valueMissing: 'O campo de logradouro não pode estar vazio.',
+    },
+    cidade: {
+        valueMissing: 'O campo de cidade não pode estar vazio.',
+    },
+    estado: {
+        valueMissing: 'O campo de estado não pode estar vazio.',
     }
 
 }
 
 const validadores = {
     dataNascimento:input => validaDataNascimento(input),
-    cpf:input => validaCPF(input)
+    cpf:input => validaCPF(input),
+    cep:input => recuperarCEP(input)
 
 }
 
@@ -83,7 +93,7 @@ function maiorQue18(data) {
 }
 
 function  validaCPF(input) {
-    const cpfFormatado = input.value.replace(/\D/g, '')      // Pegando tudo que não for dígito e colocando '' para formatar o cpf
+    const cpfFormatado = input.value.replace(/\D/g, '')      // O que não for dígito coloca == '' para formatar
     let mensagem = ''
 
     if(!chechaCPFRepetido(cpfFormatado) || !checaEstruturaCPF(cpfFormatado)) {
@@ -149,19 +159,22 @@ function confirmaDigito(soma) {
     return 11 - (soma % 11)
 }
 
+function recuperarCEP(input) {
+    const cep = input.value.replace(/\D/g, '')
+    const url = `https://viacep.com.br/ws/${cep}/json/`
+    const options = {
+        method: 'GET' ,
+        mode: 'cors' ,
+        headers: {
+            'content-type': 'application/json;charset=utf-8'
+        }
+    }
 
-
-/*
-function getCEP(url) {
-    fetch(url)
-      .then(res => res.json())
-      .then(json => showContent(json))
-  }
-  
-  function showContent(cep) {
-    console.log(cep.localidade)
-  }
-  
-  getCEP('https://viacep.com.br/ws/58015430/json/')
-*/
+    if(!input.validity.patternMismatch && !input.validity.valueMissing) {
+        fetch(url, options)
+        .then(response => response.json())
+        .then( data => { console.log(data) } )
+                    
+    }
+}
 
